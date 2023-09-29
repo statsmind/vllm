@@ -4,6 +4,7 @@
 import argparse
 import asyncio
 import json
+import logging
 import time
 from http import HTTPStatus
 from typing import AsyncGenerator, Dict, List, Optional, Tuple, Union
@@ -41,6 +42,7 @@ except ImportError:
 
 TIMEOUT_KEEP_ALIVE = 5  # seconds
 
+logging.basicConfig(level=logging.INFO)
 logger = init_logger(__name__)
 served_model = None
 app = fastapi.FastAPI()
@@ -81,6 +83,8 @@ async def get_gen_prompt(request) -> str:
             "Please upgrade fastchat to use: `$ pip install -U fschat`")
 
     conv = get_conversation_template(request.model)
+    logger.info(f"resolved conv = {conv}")
+
     conv = Conversation(
         name=conv.name,
         system_template=conv.system_template,
@@ -88,7 +92,7 @@ async def get_gen_prompt(request) -> str:
         roles=conv.roles,
         messages=list(conv.messages),  # prevent in-place modification
         offset=conv.offset,
-        sep_style=SeparatorStyle(conv.sep_style),
+        sep_style=SeparatorStyle(conv.sep_style if conv.sep_style is None else SeparatorStyle.ADD_COLON_SINGLE),
         sep=conv.sep,
         sep2=conv.sep2,
         stop_str=conv.stop_str,
