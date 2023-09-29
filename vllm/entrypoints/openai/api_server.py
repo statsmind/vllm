@@ -92,7 +92,7 @@ async def get_gen_prompt(request) -> str:
         roles=conv.roles,
         messages=list(conv.messages),  # prevent in-place modification
         offset=conv.offset,
-        sep_style=SeparatorStyle(conv.sep_style if conv.sep_style is None else SeparatorStyle.ADD_COLON_SINGLE),
+        sep_style=SeparatorStyle(conv.sep_style if conv.sep_style is not None else SeparatorStyle.ADD_COLON_SINGLE),
         sep=conv.sep,
         sep2=conv.sep2,
         stop_str=conv.stop_str,
